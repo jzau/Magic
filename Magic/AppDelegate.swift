@@ -21,7 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 //    then the user would have to click the menubar item twice
 //    to make Desktop reappear
 
-    var desktopShown: Bool {
+    var isDesktopHidden: Bool {
         var finderPlistPath: URL?
 
         if #available(OSX 10.12, *) {
@@ -41,22 +41,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 print("Plist Convertion Error: \(error)")
             }
 
-            if let value = dict?.value(forKey: "CreateDesktop") as? String {
-                return Bool(value)!
+            if let value = dict?.value(forKey: "CreateDesktop") as? String,
+                let result = Bool(value) {
+                return result
             }
         } else {
             // Fallback on earlier versions
-            if let dict = NSDictionary(contentsOf: finderPlistPath!) {
-                return Bool(dict.value(forKey: "CreateDesktop") as! String)!
-                //                  dict.value(forKey: "CreateDesktop") would produce
-                //                  Any?, Bool initializer only accepts (Bool), (String), (NSNumber)
-                //
-                //                  dict.value(forKey: "CreateDesktop") as? Bool
-                //                  does not work either, somehow the system would try to convert
-                //                  dict.value(forKey: "CreateDesktop") NSTaggedPointerString
-                //                  to NSNumber first, which fails.
+            if let dict = NSDictionary(contentsOf: finderPlistPath!),
+                let value = dict.value(forKey: "CreateDesktop") as? String,
+                let result = Bool(value) {
+                return result
             }
-
+            //    dict.value(forKey: "CreateDesktop") would produce
+            //    Any?, Bool initializer only accepts (Bool), (String), (NSNumber)
+            //    dict.value(forKey: "CreateDesktop") as? Bool
+            //    does not work either, somehow the system would try to convert
+            //    dict.value(forKey: "CreateDesktop") NSTaggedPointerString
+            //    to NSNumber first, which fails.
         }
         
         return false
@@ -87,7 +88,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let process = Process()
         process.launchPath = "/bin/bash"
-        process.arguments = ["-c", "defaults write com.apple.finder CreateDesktop \(!desktopShown); killall Finder"]
+        process.arguments = ["-c", "defaults write com.apple.finder CreateDesktop \(!isDesktopHidden); killall Finder"]
         process.launch()
         print("Desktop State Flipped")
     }
