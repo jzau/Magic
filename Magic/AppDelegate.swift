@@ -20,47 +20,47 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 //    when the app relauches, Desktop could be already hidden
 //    then the user would have to click the menubar item twice
 //    to make Desktop reappear
-    
+
     var desktopShown: Bool {
         var finderPlistPath: URL?
-        
+
         if #available(OSX 10.12, *) {
             finderPlistPath = FileManager().homeDirectoryForCurrentUser
         } else {
             // Fallback on earlier versions
             finderPlistPath = URL(fileURLWithPath: NSHomeDirectory())
         }
-        
+
         finderPlistPath = finderPlistPath!.appendingPathComponent("Library/Preferences/com.apple.finder.plist")
-        
-//        if #available(OSX 10.13, *) {
-//            var dict: NSDictionary?
-//            do {
-//                dict = try NSDictionary(contentsOf: finderPlistPath!, error: ())
-//            } catch {
-//                print("Plist Convertion Error: \(error)")
-//            }
-//
-//            if let value = dict?.value(forKey: "CreateDesktop") as? Bool {
-//                return value
-//            }
-//        } else {
-//            // Fallback on earlier versions
-//
-//        }
-        
-        if let dict = NSDictionary(contentsOf: finderPlistPath!) {
-            return Bool(dict.value(forKey: "CreateDesktop") as! String)!
-//                  dict.value(forKey: "CreateDesktop") would produce
-//                  Any?, Bool initializer only accepts (Bool), (String), (NSNumber)
-//
-//                  dict.value(forKey: "CreateDesktop") as? Bool
-//                  does not work either, somehow the system would try to convert
-//                  dict.value(forKey: "CreateDesktop") NSTaggedPointerString
-//                  to NSNumber first, which fails.
+
+        if #available(OSX 10.13, *) {
+            var dict: NSDictionary?
+            do {
+                dict = try NSDictionary(contentsOf: finderPlistPath!, error: ())
+            } catch {
+                print("Plist Convertion Error: \(error)")
+            }
+
+            if let value = dict?.value(forKey: "CreateDesktop") as? String {
+                return Bool(value)!
+            }
+        } else {
+            // Fallback on earlier versions
+            if let dict = NSDictionary(contentsOf: finderPlistPath!) {
+                return Bool(dict.value(forKey: "CreateDesktop") as! String)!
+                //                  dict.value(forKey: "CreateDesktop") would produce
+                //                  Any?, Bool initializer only accepts (Bool), (String), (NSNumber)
+                //
+                //                  dict.value(forKey: "CreateDesktop") as? Bool
+                //                  does not work either, somehow the system would try to convert
+                //                  dict.value(forKey: "CreateDesktop") NSTaggedPointerString
+                //                  to NSNumber first, which fails.
+            }
+
         }
         
         return false
+        
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
