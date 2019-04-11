@@ -21,7 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 //    then the user would have to click the menubar item twice
 //    to make Desktop reappear
 
-    var isDesktopHidden: Bool {
+    var isDesktopShown: Bool {
         var finderPlistPath: URL?
 
         if #available(OSX 10.12, *) {
@@ -88,7 +88,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let process = Process()
         process.launchPath = "/bin/bash"
-        process.arguments = ["-c", "defaults write com.apple.finder CreateDesktop \(!isDesktopHidden); killall Finder"]
+        process.arguments = ["-c", "defaults write com.apple.finder CreateDesktop \(!isDesktopShown); killall Finder"]
         process.launch()
         print("Desktop State Flipped")
     }
